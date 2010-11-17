@@ -20,7 +20,7 @@ function noHotlink($url) {
 
 		</body>
 		</html>
-		<?
+		<?php
 		exit;
 	}
 }
