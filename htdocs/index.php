@@ -45,14 +45,15 @@ $url = substr($_SERVER['SCRIPT_URL'], 1);
 // Select our repository based upon hostname
 $gitUser = 'jquery';
 switch ($_SERVER['HTTP_HOST']) {
+	case 'local.view.jqueryui.com':
 	case 'view.jqueryui.com':
-		$rawUrl = 'http://github.com/jquery/jquery-ui/raw/';
+		$rawUrl = 'https://github.com/jquery/jquery-ui/raw/';
 		$gitRepository = 'jquery-ui';
 		break;
 
 	case 'view.jquery.com':
 	default:
-		$rawUrl = 'http://github.com/jquery/jquery/raw/';
+		$rawUrl = 'https://github.com/jquery/jquery/raw/';
 		$gitRepository = 'jquery';
 		break;
 }

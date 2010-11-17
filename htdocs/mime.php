@@ -191,5 +191,7 @@ function getMimeType($file) {
 	$ext = strtolower(array_pop(explode('.', $file)));
 	if ( isset($mime_types[$ext]) ) {
 		return $mime_types[$ext];
+	} else {
+		return "text/plain";
 	}
 }
