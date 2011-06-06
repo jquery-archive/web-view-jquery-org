@@ -49,23 +49,24 @@ function proxyUrl($url) {
 	return $response;
 }
 
-$url = substr($_SERVER['SCRIPT_URL'], 1);
+$url = $_REQUEST['q'];
 
 // Select our repository based upon hostname
 $gitUser = 'jquery';
+$gitUrl = "https://raw.github.com/jquery";
 switch ($_SERVER['HTTP_HOST']) {
 	case 'local.view.jqueryui.com':
 	case 'view.jqueryui.com':
-		$rawUrl = 'https://raw.github.com/jquery/jquery-ui/';
 		$gitRepository = 'jquery-ui';
 		break;
 
 	case 'view.jquery.com':
 	default:
-		$rawUrl = 'https://raw.github.com/jquery/jquery/';
 		$gitRepository = 'jquery';
 		break;
 }
+$rawUrl = $gitUrl . '/' . $gitRepository . '/';
+
 
 /*
 header('Content-type: text/plain');
@@ -80,35 +81,62 @@ if ( preg_match('/\.[a-z0-9]+$/i', $url) ) {
 	noHotlink($_SERVER['SCRIPT_URL']);
 	header ('Content-type: ' . getMimeType($rawUrl . $url) );
 	echo proxyUrl($rawUrl . $url);
-} else {
-	// We have a directory listing
-	require_once('git-proxy.php');
+	// proxyUrl handles showing the file, bail.
+	exit;
+} 
 
-	$git = new GitProxy($gitUser, $gitRepository);
-	$parts = explode('/', $url);
-
-	// Pull the first empty item off the array
-	array_shift($parts);
-
-	if ( $parts[0] == 'branches' ) {
-		$branches = $git->listBranches();
-		if ( $branches ) {
-			echo '<ul>';
-			foreach ($branches AS $name => $sha) {
-				echo '<li><a href="/' . $sha . '">' . $name . '</a></li>';
-			}
-			echo '</ul>';
-		}
-	} else {
-		header('Content-type: text/plain');
-		$tree = $git->tree( join('/', $parts) );
-		echo '<ul>';
-		if ( !empty( $tree ) ) {
-		  foreach ($tree AS $obj) {
-  			echo '<li><a href="' . $parts[0] . '">' . $name . '</a></li>';
-  		}
-		}
-		echo '</ul>';
-		print_r( $git->tree( $parts[0] ) );
-	}
+if ( isset( $_REQUEST['url'] ) && !empty( $_REQUEST['url'] ) ) {
+  $url = $_REQUEST['url'];
+  $output = false;
+  preg_match( '/github.com\/jquery\/([^\/]+)\/(blob\/)?(.*)$/', $url, $matches );
+  if ( !empty( $matches ) && !empty( $matches[3] ) ) {
+    if ( $matches[1] === "jquery" ) {
+      $output = "http://view.jquery.org/" . $matches[3];
+    }
+    if ( $matches[1] === "jquery-ui" ) {
+      $output = "http://view.jqueryui.com/" . $matches[3];
+    }
+  }
+  if ( $output ) {
+    header( 'Location: ' . $output );
+  }
 }
+?>
+<!DoctypE html>
+<html>
+<head>
+  <title>jQuery Git Proxy</title>
+  <style>
+    body {
+      font-family: Arial;
+    }
+    input[type="text"] {
+      width:500px;
+      border:1px solid #555;
+      padding:5px;
+      font-size:1.2em;
+    }
+    input[type="submit"] {
+      border:1px solid #555;
+      cursor: pointer;
+      background: #CCC;
+      font-size:1.2em;
+      padding:5px;
+    }
+  </style>
+</head>
+<body>
+  <form>
+    <h1>Paste in github file-uri to proxy</h1>
+    <p>Examples:
+      <ul>
+        <li>https://github.com/jquery/jquery-ui/blob/master/demos/accordion/index.html</li>
+        <li>https://github.com/jquery/jquery/blob/master/src/ajax.js</a>
+      </ul>
+    <p>
+    <input type="text" name="url" size="30" />
+    <input type="submit" name="submit" value="Go" />
+  </form>
+</body>
+</html>
+ 
