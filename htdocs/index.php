@@ -1,4 +1,6 @@
 <?php
+$debug = isset( $_REQUEST['debug'] );
+
 function noHotlink($url) {
 	if ( !empty($_SERVER['HTTP_REFERER']) && !preg_match('/^https?\:\/\/([^\/]+\.)?jquery(ui)?\.(com|org)\//', $_SERVER['HTTP_REFERER']) 
 		&& !preg_match('/^https?\:\/\/(fiddle\.jshell\.net|jsfiddle\.net|jsbin\.com)\/.*/', $_SERVER['HTTP_REFERER']) ) {
@@ -26,16 +28,23 @@ function noHotlink($url) {
 }
 
 function proxyUrl($url) {
+  if ( $debug ) {
+    echo "URL: $url\n";
+  }
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_URL, $url);
 	curl_setopt($ch, CURLOPT_HEADER, 0);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt( $ch, CURLOPT_SSL_VERIFYPEER, false );
 	$response = curl_exec($ch);
 	$statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 	curl_close($ch);
 	if ( $statusCode == '404' ) {
 		echo "404 occurred: $url\n";
 		return false;
+	}
+	if ( $debug ) {
+	  echo "STATUS: $statusCode\n";
 	}
 	return $response;
 }
@@ -47,13 +56,13 @@ $gitUser = 'jquery';
 switch ($_SERVER['HTTP_HOST']) {
 	case 'local.view.jqueryui.com':
 	case 'view.jqueryui.com':
-		$rawUrl = 'https://github.com/jquery/jquery-ui/raw/';
+		$rawUrl = 'https://raw.github.com/jquery/jquery-ui/';
 		$gitRepository = 'jquery-ui';
 		break;
 
 	case 'view.jquery.com':
 	default:
-		$rawUrl = 'https://github.com/jquery/jquery/raw/';
+		$rawUrl = 'https://raw.github.com/jquery/jquery/';
 		$gitRepository = 'jquery';
 		break;
 }
@@ -75,10 +84,9 @@ if ( preg_match('/\.[a-z0-9]+$/i', $url) ) {
 	// We have a directory listing
 	require_once('git-proxy.php');
 
-	$url = $_SERVER['SCRIPT_URL'];
-
 	$git = new GitProxy($gitUser, $gitRepository);
 	$parts = explode('/', $url);
+
 	// Pull the first empty item off the array
 	array_shift($parts);
 
@@ -95,8 +103,10 @@ if ( preg_match('/\.[a-z0-9]+$/i', $url) ) {
 		header('Content-type: text/plain');
 		$tree = $git->tree( join('/', $parts) );
 		echo '<ul>';
-		foreach ($tree AS $obj) {
-			echo '<li><a href="' . $parts[0] . '">' . $name . '</a></li>';
+		if ( !empty( $tree ) ) {
+		  foreach ($tree AS $obj) {
+  			echo '<li><a href="' . $parts[0] . '">' . $name . '</a></li>';
+  		}
 		}
 		echo '</ul>';
 		print_r( $git->tree( $parts[0] ) );
