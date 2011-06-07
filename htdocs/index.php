@@ -103,27 +103,65 @@ if ( isset( $_REQUEST[ 'url' ] ) && !empty( $_REQUEST[ 'url' ] ) ) {
 <head>
   <title>jQuery Git Proxy</title>
   <style>
+    html, body { height:100%; }
     body {
       font-family: Arial;
+      background:#888;
+      background-image: -webkit-gradient(
+          linear,
+          left bottom,
+          left top,
+          color-stop(0, rgb(42,46,43)),
+          color-stop(0.71, rgb(110,117,117))
+      );
+      background-image: -moz-linear-gradient(
+          center bottom,
+          rgb(42,46,43) 0%,
+          rgb(110,117,117) 71%
+      );
+      text-align:center;
+    }
+    h1 {
+      font-size:2.4em;
+       text-shadow: rgba(0,0,0,0.5) -1px 0, rgba(0,0,0,0.3) 0 -1px, rgba(255,255,255,0.5) 0 1px, rgba(0,0,0,0.3) -1px -1px; 
     }
     input[type="text"] {
       width:500px;
       border:1px solid #555;
       padding:5px;
       font-size:1.2em;
-    }
+      border-radius:5px;
+      background:#444;
+      background: rgba(0,0,0,.5 );
+      color:#CCC;
+      outline:none;
+   }
     input[type="submit"] {
       border:1px solid #555;
       cursor: pointer;
-      background: #CCC;
+      background: #333;
       font-size:1.2em;
       padding:5px;
+      border-radius:5px;
+      background-image: -webkit-gradient(
+          linear,
+          left bottom,
+          left top,
+          color-stop(0.41, rgb(8,8,8)),
+          color-stop(0.52, rgb(77,77,77))
+      );
+      background-image: -moz-linear-gradient(
+          center bottom,
+          rgb(8,8,8) 41%,
+          rgb(77,77,77) 52%
+      );
+      color:#DDD;      
     }
     #error {
       margin:10px;
       padding:10px;
       font-size:1.2em;
-      color:#FF0000;
+      color:#5f1313;
     }
   </style>
 </head>
@@ -135,12 +173,10 @@ if ( isset( $_REQUEST[ 'url' ] ) && !empty( $_REQUEST[ 'url' ] ) ) {
   <?php endif; ?>
   <form method="POST">
     <h1>Paste in github file-uri to proxy</h1>
-    <p>Examples:
-      <ul>
-        <li>https://github.com/jquery/jquery-ui/blob/master/demos/accordion/index.html</li>
-        <li>https://github.com/jquery/jquery/blob/master/src/ajax.js</a>
-      </ul>
-    <p>
+    <p>Examples: <br />
+        https://github.com/jquery/jquery-ui/blob/master/demos/accordion/index.html <br />
+        https://github.com/jquery/jquery/blob/master/src/ajax.js
+    </p>
     <input type="text" name="url" size="30" autofocus />
     <input type="submit" name="submit" value="Go" />
   </form>
