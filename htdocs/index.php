@@ -1,5 +1,5 @@
 <?php
-$debug = isset( $_REQUEST['debug'] );
+$debug = false;
 
 function noHotlink($url) {
 	if ( !empty($_SERVER['HTTP_REFERER']) && !preg_match('/^https?\:\/\/([^\/]+\.)?jquery(ui)?\.(com|org)\//', $_SERVER['HTTP_REFERER']) 
@@ -27,18 +27,18 @@ function noHotlink($url) {
 	}
 }
 
-function proxyUrl($url) {
+function proxyUrl( $url ) {
   if ( $debug ) {
     echo "URL: $url\n";
   }
 	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_URL, $url);
-	curl_setopt($ch, CURLOPT_HEADER, 0);
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt( $ch, CURLOPT_URL, $url );
+	curl_setopt( $ch, CURLOPT_HEADER, 0 );
+	curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
 	curl_setopt( $ch, CURLOPT_SSL_VERIFYPEER, false );
-	$response = curl_exec($ch);
-	$statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-	curl_close($ch);
+	$response = curl_exec( $ch );
+	$statusCode = curl_getinfo( $ch, CURLINFO_HTTP_CODE );
+	curl_close( $ch );
 	if ( $statusCode == '404' ) {
 		echo "404 occurred: $url\n";
 		return false;
@@ -49,34 +49,27 @@ function proxyUrl($url) {
 	return $response;
 }
 
-$url = $_REQUEST['q'];
+$url = $_REQUEST[ 'q' ]; //use local .htaccess if available
+if ( !$url ) {
+  $url = $_SERVER[ 'SCRIPT_NAME' ]; // use server config (workaround for now)
+} 
+$url = preg_replace( '/^\//', '', $url ); // kill the first '/'
+
+
 
 // Select our repository based upon hostname
 $gitUser = 'jquery';
 $gitUrl = "https://raw.github.com/jquery";
-switch ($_SERVER['HTTP_HOST']) {
-	case 'local.view.jqueryui.com':
-	case 'view.jqueryui.com':
-		$gitRepository = 'jquery-ui';
-		break;
-
-	case 'view.jquery.com':
-	default:
-		$gitRepository = 'jquery';
-		break;
+$gitRepository = 'jquery';
+if ( $_SERVER[ 'HTTP_HOST'] == 'local.view.jqueryui.com' || $_SERVER[ 'HTTP_HOST' ] == 'view.jqueryui.com' ) {
+  $gitRepository = 'jquery-ui';
 }
+// create our starting url depending on desired repo
 $rawUrl = $gitUrl . '/' . $gitRepository . '/';
 
 
-/*
-header('Content-type: text/plain');
-echo 'raw: ' . $rawUrl . "\n";
-echo 'url: ' . $url . "\n";
-exit;
-*/
-
-// Do we have a raw request? (There's a file extension)
-if ( preg_match('/\.[a-z0-9]+$/i', $url) ) {
+// Do we have a raw request? (There's a file extension and it ain't .php)
+if ( !preg_match( '/\.php/', $url ) && preg_match('/\.[a-z0-9]+$/i', $url) ) {
 	require_once('mime.php');
 	noHotlink($_SERVER['SCRIPT_URL']);
 	header ('Content-type: ' . getMimeType($rawUrl . $url) );
@@ -85,9 +78,10 @@ if ( preg_match('/\.[a-z0-9]+$/i', $url) ) {
 	exit;
 } 
 
-if ( isset( $_REQUEST['url'] ) && !empty( $_REQUEST['url'] ) ) {
-  $url = $_REQUEST['url'];
-  $output = false;
+// Did we ask to create a url from github's?
+if ( isset( $_REQUEST[ 'url' ] ) && !empty( $_REQUEST[ 'url' ] ) ) {
+  $url = trim( $_REQUEST[ 'url' ] );
+  $output = $error = false;
   preg_match( '/github.com\/jquery\/([^\/]+)\/(blob\/)?(.*)$/', $url, $matches );
   if ( !empty( $matches ) && !empty( $matches[3] ) ) {
     if ( $matches[1] === "jquery" ) {
@@ -99,6 +93,8 @@ if ( isset( $_REQUEST['url'] ) && !empty( $_REQUEST['url'] ) ) {
   }
   if ( $output ) {
     header( 'Location: ' . $output );
+  }else {
+    $error = "Error creating link.";
   }
 }
 ?>
@@ -123,10 +119,21 @@ if ( isset( $_REQUEST['url'] ) && !empty( $_REQUEST['url'] ) ) {
       font-size:1.2em;
       padding:5px;
     }
+    #error {
+      margin:10px;
+      padding:10px;
+      font-size:1.2em;
+      color:#FF0000;
+    }
   </style>
 </head>
 <body>
-  <form>
+  <?php if ( !empty( $error ) ): ?>
+    <div id="error">
+      <?php echo $error; ?>
+    </div>
+  <?php endif; ?>
+  <form method="POST">
     <h1>Paste in github file-uri to proxy</h1>
     <p>Examples:
       <ul>
@@ -134,7 +141,7 @@ if ( isset( $_REQUEST['url'] ) && !empty( $_REQUEST['url'] ) ) {
         <li>https://github.com/jquery/jquery/blob/master/src/ajax.js</a>
       </ul>
     <p>
-    <input type="text" name="url" size="30" />
+    <input type="text" name="url" size="30" autofocus />
     <input type="submit" name="submit" value="Go" />
   </form>
 </body>
