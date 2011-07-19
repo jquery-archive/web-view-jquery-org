@@ -72,28 +72,20 @@ def go(options):
 		gitCheckoutProc = subprocess.Popen(gitCheckoutIndexCmd, shell=True, cwd=options.localDest+'/reporoot/', stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 		(cmdOut,cmdErr) = gitCheckoutProc.communicate()			
 		print cmdOut,cmdErr
-			
-	if False:
-		for root,dirs,files in os.walk(options.localDest,topdown=True):
-			for dir in dirs:
-				print root+dir
-			for file in files:
-				print root+'/'+file
-				
 
 def main():
-		parser = optparse.OptionParser()
+	parser = optparse.OptionParser()
+	
+	parser.add_option("--localdest", dest="localDest", help="path where you want all branches saved")
+	parser.add_option("--username", dest="username",help="optional. only required if --repourl present")
+	parser.add_option("--repourl", dest="repoUrl", help="optional. only required if doing a clone (running the command for first time)")
+	parser.add_option("--maindir", dest="repoRoot", help="optional. the directory name for the clone. all branches will be copied from here. default reporoot", default="reporoot")
+	parser.add_option("--showcmds", dest="showCmd", help="optional. used for debuggin. will print every command while executing")
+	(options,args) = parser.parse_args(sys.argv[1:])
 		
-		parser.add_option("--localdest", dest="localDest", help="path where you want all branches saved")
-		parser.add_option("--username", dest="username",help="optional. only required if --repourl present")
-		parser.add_option("--repourl", dest="repoUrl", help="optional. only required if doing a clone (running the command for first time)")
-		parser.add_option("--maindir", dest="repoRoot", help="optional. the directory name for the clone. all branches will be copied from here. default reporoot", default="reporoot")
-		parser.add_option("--showcmds", dest="showCmd", help="optional. used for debuggin. will print every command while executing")
-		(options,args) = parser.parse_args(sys.argv[1:])
-		
-		go(options)
+	go(options)
 		
 if __name__ == "__main__":
-		main()
+	main()
 
 
