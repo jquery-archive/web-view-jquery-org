@@ -65,7 +65,9 @@ def go(options):
 		print '##starting branch '+branch
 		
 		#CHECKOUT COMMAND change the branch
-		gitCheckoutCmd = 'git checkout '+branch+';'
+		gitCheckoutCmd = 'git checkout -f' + branch + ';'
+		# pull branch down, and set the HEAD to origin's 
+		gitChekcoutCmd += 'git pull; git reset --hard origin/' + branch + ';'
 		if options.showCmd: print '##command:\n'+gitCheckoutCmd
 		gitCheckoutProc = subprocess.Popen(gitCheckoutCmd, shell=True, cwd=options.localDest+options.repoRoot+'/', stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 		(cmdOut,cmdErr) = gitCheckoutProc.communicate()		
