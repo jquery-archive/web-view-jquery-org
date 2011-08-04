@@ -23,7 +23,7 @@ def getBranches(options):
                 b = branch[ branch.rfind('/')+1: ]
                 if len(b) > 0:
                         branches.append(b);
-        return branches
+        return sorted(set(branches))
 
 
 def go(options):
