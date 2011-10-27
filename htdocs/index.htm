@@ -85,7 +85,7 @@
     <div id="branch-list"></div>
   </section>
 </body>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
 <script>
     var app = {
       getBranches : function() {
@@ -111,7 +111,6 @@
       $branchList = $( '#branch-list' );
       $.when( app.getBranches() )
         .done( function( d ) {
-          console.log( d );
           app.renderBranches( $branchList, d );
         })
         .fail( function() {
