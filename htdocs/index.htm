@@ -63,10 +63,12 @@
       font-size:1.2em;
       color:#5f1313;
     }
-    #branch-list a {
+    
+    .listing a {
       color:#000;
-      padding:2px 10px;
+      padding:2px 10px;      
    }
+   
   </style>
 </head>
 <body>
@@ -80,9 +82,13 @@
       <input type="submit" name="submit" value="Go" />
     </form>
   </section>
-  <section>
+  <section class="listingSection">
     <h1>Or Start Browsing jQuery UI</h1>
-    <div id="branch-list"></div>
+    <h2>Branches:</h2>
+    <div id="branch-list" class="listing"></div>
+    
+    <h2>Tags:</h2>
+    <div id="tag-list" class="listing"></div>
   </section>
 </body>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
@@ -94,9 +100,9 @@
           dataType: "json"
         });
       },
-      renderBranches : function( $dest, data ) {
+      renderRepoList : function( $dest, data, prefix ) {
         return $dest.html( $.map( data, function(v,i){
-          return '<a href="/' + v + '">' + v + '</a>';
+          return '<a href="' + prefix + '/' + v + '">' + v + '</a> ';
         }).join('') );
       },
       convertUrl : function( url ) {
@@ -109,9 +115,11 @@
     }
     $( document ).ready( function() {
       $branchList = $( '#branch-list' );
+      $tagList = $( '#tag-list' );
       $.when( app.getBranches() )
         .done( function( d ) {
-          app.renderBranches( $branchList, d );
+          app.renderRepoList( $branchList, d.branches, 'branches' );
+          app.renderRepoList( $tagList, d.tags, 'tags' );
         })
         .fail( function() {
           $branchList.html( 'Error getting branches' );
