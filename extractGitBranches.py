@@ -62,8 +62,11 @@ def go(options):
         (cmdOut,cmdErr) = gitCloneProc.communicate()
         print cmdOut, cmdErr
 
+    prefixDir = ''
+    if options.organize:
+        prefixDir = 'branches/'
+
     branches = getBranches(options)
-    prefixDir = 'branches/' if options.organize else ''
     for branch in branches:
         print '##starting branch '+branch
         
@@ -79,8 +82,12 @@ def go(options):
         print cmdOut,cmdErr
         
     if options.getTags :
+        
+        prefixDir = ''
+        if options.organize: 
+            prefixDir = 'tags/'
+
         tags = getTags(options)
-        prefixDir = 'tags/' if options.organize else ''
         for tag in tags:
             print '##starting tag '+tag
 
