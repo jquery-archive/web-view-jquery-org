@@ -118,8 +118,8 @@
       $tagList = $( '#tag-list' );
       $.when( app.getBranches() )
         .done( function( d ) {
-          app.renderRepoList( $branchList, d.branches, 'branches' );
-          app.renderRepoList( $tagList, d.tags, 'tags' );
+          app.renderRepoList( $branchList, d.branches, '' );
+          app.renderRepoList( $tagList, d.tags, '' );
         })
         .fail( function() {
           $branchList.html( 'Error getting branches' );
