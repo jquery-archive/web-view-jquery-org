@@ -102,13 +102,13 @@
       },
       renderRepoList : function( $dest, data, prefix ) {
         return $dest.html( $.map( data, function(v,i){
-          return '<a href="' + prefix + '/' + v + '">' + v + '</a> ';
+          return '<a href="' + prefix + '/' + v + '/">' + v + '</a> ';
         }).join('') );
       },
       convertUrl : function( url ) {
         var match = /github.com\/jquery\/([^\/]+)\/(blob\/)?(.*)$/.exec( url );
         if ( match ) {
-          return "http://view.jqueryui.com/" + match[3];
+          return "http://" + location.host + "/" + match[3];
         }
         return false;
       }
