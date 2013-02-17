@@ -46,6 +46,11 @@ def go(options):
 
     if len(os.listdir(options.localDest))>0:
         print '--direcotry is not empty. assuming clone already done. fetching updates...'
+        cmdPull = 'git fetch'
+        if options.showCmd: print '##command: '+cmdPull
+        gitPullProc = subprocess.Popen(cmdPull,shell=True,cwd=options.localDest+options.repoRoot+'/',stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        (cmdOut,cmdErr) = gitPullProc.communicate()
+        print cmdOut,cmdErr
         cmdPull = 'git fetch -t'
         if options.showCmd: print '##command: '+cmdPull
         gitPullProc = subprocess.Popen(cmdPull,shell=True,cwd=options.localDest+options.repoRoot+'/',stdout=subprocess.PIPE,stderr=subprocess.PIPE)
